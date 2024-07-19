@@ -1,13 +1,13 @@
-version: '3.8'
+version: "3.8"
 
-name: 'axum-rest-api'
+name: "axum-rest-api"
 
 services:
   db:
     container_name: axum-rest-api-db
     image: mongo
     ports:
-      - '27017:27017'
+      - "27017:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=password
