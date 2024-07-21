@@ -31,7 +31,7 @@ impl Item {
             _id: String::from(""),
             name: String::from(""),
             description: String::from(""),
-            price: 0.0,
+            price: f32::from(0.00),
         }
     }
 }

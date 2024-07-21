@@ -4,7 +4,11 @@ pub mod item;
 
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
-use axum::{http::Method, routing::get, Router};
+use axum::{
+    http::Method,
+    routing::{get, post},
+    Router,
+};
 use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]
@@ -20,6 +24,7 @@ async fn main() {
                 .allow_origin(Any)
                 .allow_methods([Method::GET, Method::POST]),
         )
+        .route("/item", post(item::handler::insert_one_item))
         .route("/", get(|| async { "Hello, World!111222" }));
 
     config::db::db_connect().await.unwrap();
