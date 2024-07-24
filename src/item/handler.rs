@@ -56,3 +56,9 @@ pub async fn find_one_item_by_id(Path(item_id): Path<String>) -> impl IntoRespon
         ),
     }
 }
+
+pub async fn find_item() -> impl IntoResponse {
+    let items = usecase::find_item().await;
+
+    (StatusCode::OK, Json(json!(items)).into_response())
+}

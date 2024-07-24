@@ -2,7 +2,10 @@ use crate::config::db::db_connect;
 
 use super::entity::{InsertItemReq, Item, ItemBson};
 use bson::{from_document, oid::ObjectId};
-use mongodb::bson::{doc, Document};
+use mongodb::{
+    bson::{doc, Document},
+    Cursor,
+};
 use std::result::Result;
 use tracing::log::error;
 
@@ -79,4 +82,53 @@ pub async fn find_one_item_by_id(id: ObjectId) -> Result<Item, String> {
         description: item.description,
         price: item.price,
     })
+}
+
+pub async fn find_item() -> Vec<Item> {
+    let db = match db_connect().await {
+        Ok(r) => r,
+        Err(e) => panic!("Error: {}", e),
+    };
+
+    let col = db.collection::<Document>("item");
+
+    let curser_result = col.find(doc! {}).await;
+
+    let mut cursor: Cursor<Document> = match curser_result {
+        Ok(r) => r,
+        Err(e) => {
+            error!("Error: {:?}", e);
+            return Vec::new();
+        }
+    };
+
+    let mut item: Vec<Item> = Vec::new();
+    while let Ok(next) = cursor.advance().await {
+        if !next {
+            break;
+        }
+
+        let item_doc = match cursor.deserialize_current().ok() {
+            Some(doc) => doc,
+            None => break,
+        };
+
+        let item_bson: ItemBson =
+            match from_document(item_doc).map_err(|e| format!("Error: {:?}", e)) {
+                Ok(i) => i,
+                Err(e) => {
+                    error!("Error: {:?}", e);
+                    return Vec::new();
+                }
+            };
+
+        item.push(Item {
+            _id: item_bson._id.to_hex(),
+            name: item_bson.name,
+            description: item_bson.description,
+            price: item_bson.price,
+        });
+    }
+
+    item
 }

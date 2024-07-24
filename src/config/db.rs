@@ -9,5 +9,6 @@ pub async fn db_connect() -> mongodb::error::Result<Database> {
     let db = client.database("axum-rest-api");
 
     info!("Connected to MongoDB");
+
     Ok(db)
 }

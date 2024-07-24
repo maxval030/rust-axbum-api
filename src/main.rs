@@ -26,6 +26,7 @@ async fn main() {
         )
         .route("/item", post(item::handler::insert_one_item))
         .route("/item/:id", get(item::handler::find_one_item_by_id))
+        .route("/item-list", get(item::handler::find_item))
         .route("/", get(|| async { "Hello, World!111222" }));
 
     config::db::db_connect().await.unwrap();
